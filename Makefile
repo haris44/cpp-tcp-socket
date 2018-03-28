@@ -15,9 +15,11 @@ client: $(client_objects)
 Socket: Socket.cpp
 ServerSocket: ServerSocket.cpp
 ClientSocket: ClientSocket.cpp
-server: server.cpp
-client: client.cpp
+server.o: server.cpp
+	g++ -std=c++11 -lpthread -pthread -c server.cpp
 
+client.o: client.cpp
+	g++ -std=c++11 -lpthread -pthread -c client.cpp
 
 clean:
 	rm -f *.o server client
