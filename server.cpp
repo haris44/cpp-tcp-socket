@@ -7,6 +7,13 @@
 
 using namespace std;
 
+class User
+{
+
+  ServerSocket *socket;
+  string name;
+};
+
 int main(int argc, char *argv[])
 {
 
@@ -25,32 +32,50 @@ int main(int argc, char *argv[])
   try
   {
     ServerSocket server(port);
+    server.set_non_blocking(true);
 
     while (true)
     {
 
-      ServerSocket new_sock;
-      server.accept(new_sock);
-      socketList.push_back(&new_sock);
+      // sleep(1);
 
-      printf("%s \n", "accept new connexion");
+      ServerSocket *new_sock = new ServerSocket();
 
       try
       {
-        while (true)
+        string data;
+        server.accept(*new_sock);
+        new_sock->set_non_blocking(true);
+        *new_sock >> data;
+        User user = new User();
+
+        socketList.push_back(new_sock);
+      }
+      catch (SocketException &e)
+      {
+        delete new_sock;
+      }
+
+      try
+      {
+        for (ServerSocket *item : socketList)
         {
-          for (ServerSocket *item : socketList)
+          string data = "";
+          try
           {
-            string data;
             *item >> data;
-            printf("%s \n", data.c_str());
-            *item << data;
+            for (ServerSocket *sendto : socketList)
+            {
+              *sendto << data;
+            }
+          }
+          catch (SocketException &e)
+          {
           }
         }
       }
-      catch (SocketException &)
+      catch (SocketException &e)
       {
-        printf("%s \n", "exception");
       }
     }
   }
