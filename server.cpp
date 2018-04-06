@@ -1,6 +1,7 @@
 #include "ServerSocket.h"
 #include "SocketException.h"
 #include <string>
+#include <sstream>
 #include <iostream>
 #include <cstdlib>
 #include <list>
@@ -10,14 +11,15 @@ using namespace std;
 class User
 {
 
+public:
   ServerSocket *socket;
-  string name;
+  string name = "0";
 };
 
 int main(int argc, char *argv[])
 {
 
-  list<ServerSocket *> socketList;
+  list<User *> socketList;
 
   if (argc != 2)
   {
@@ -46,10 +48,9 @@ int main(int argc, char *argv[])
         string data;
         server.accept(*new_sock);
         new_sock->set_non_blocking(true);
-        *new_sock >> data;
-        User user = new User();
-
-        socketList.push_back(new_sock);
+        User *user = new User();
+        user->socket = new_sock;
+        socketList.push_back(user);
       }
       catch (SocketException &e)
       {
@@ -58,15 +59,24 @@ int main(int argc, char *argv[])
 
       try
       {
-        for (ServerSocket *item : socketList)
+        for (User *item : socketList)
         {
           string data = "";
+
           try
           {
-            *item >> data;
-            for (ServerSocket *sendto : socketList)
+            *item->socket >> data;
+
+            if (item->name == "0")
             {
-              *sendto << data;
+              item->name = data;
+            }
+            else
+            {
+              for (User *sendto : socketList)
+              {
+                *sendto->socket << data;
+              }
             }
           }
           catch (SocketException &e)

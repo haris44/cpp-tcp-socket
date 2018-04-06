@@ -1,3 +1,11 @@
 {
-    "files.associations": {}
+    "files.associations": {
+        "__split_buffer": "cpp",
+        "list": "cpp",
+        "string": "cpp",
+        "vector": "cpp",
+        "iterator": "cpp",
+        "iostream": "cpp",
+        "sstream": "cpp"
+    }
 }
